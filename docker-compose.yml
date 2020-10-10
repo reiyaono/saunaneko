@@ -1,0 +1,38 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+    ports:
+      - "33065:3306"
+    volumes:
+      - db-volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  web:
+    build:
+      context: .
+      dockerfile: ./dockers/rails/Dockerfile
+    command: bash -c "bundle install;
+                      rm /app/tmp/pids/server.pid;
+                      bundle exec rails db:migrate;
+                      bundle exec rails s -p 3001 -b '0.0.0.0'"
+    tty: true
+    stdin_open: true
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+      - bundle-volume:/usr/local/bundle
+    environment:
+      RAILS_ENV: development
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_HOST: db
+    depends_on:
+      - db
+volumes:
+  db-volume:
+    driver: local
+  bundle-volume:
+    driver: local
