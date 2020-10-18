@@ -4,7 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :sauna, only: %i[index]
       resources :island, only: %i[index]
-      post 'search', to: 'v1/search#result'
+      post 'search', to: 'search#result'
     end
   end
 end

@@ -1,16 +1,24 @@
-# Be sure to restart your server when you modify this file.
+# frozen_string_literal: true
 
-# Avoid CORS issues when API is called from the frontend app.
-# Handle Cross-Origin Resource Sharing (CORS) in order to accept cross-origin AJAX requests.
+Rails.application.config.middleware.insert_before 0, Rack::Cors do
+  methods = %i[get post delete]
+  credentials_paths = %w[]
 
-# Read more: https://github.com/cyu/rack-cors
+  allow do
+    origins '*'
+    regexp_str = '/api/v1/(?!' + credentials_paths.join('|') + ')'
+    resource Regexp.new(regexp_str), headers: :any, methods: methods
+  end
 
-# Rails.application.config.middleware.insert_before 0, Rack::Cors do
-#   allow do
-#     origins 'example.com'
-#
-#     resource '*',
-#       headers: :any,
-#       methods: [:get, :post, :put, :patch, :delete, :options, :head]
-#   end
-# end
+  allow do
+    if Rails.env.production?
+      origins Settings.base_url
+    else
+      origins Regexp.new('(^https://HRE_COMES_URI$)' \
+                         + '|(^http://localhost(:[0-9]{1,5})?$)')
+    end
+
+    regexp_str = '^/api/v1/(' + credentials_paths.join('|') + ')'
+    resource Regexp.new(regexp_str), headers: :any, methods: methods, credentials: true
+  end
+end

@@ -1,0 +1,4 @@
+base_url: 'http://localhost:3000'
+
+web_client:
+  url: <%= ENV['WEB_CLIENT_URL'] || 'http://localhost:8080' %>
